@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>room ai v10</title>
+</head>
+
+<body style="background:#111;color:white;font-family:serif;">
+
+<h2>🌙 room ai</h2>
+
+<button onclick="link()">💗 подключить Telegram</button>
+
+<br><br>
+
+<input id="i" placeholder="напиши..."/>
+<button onclick="send()">send</button>
+
+<pre id="out"></pre>
+
+<script>
+
+const userId = localStorage.getItem("uid") || crypto.randomUUID();
+localStorage.setItem("uid", userId);
+
+/* 🔗 привязка Telegram */
+function link(){
+  window.open(`https://t.me/YOUR_BOT_USERNAME?start=link_${userId}`);
+}
+
+/* 💬 чат */
+async function send(){
+
+const message = document.getElementById("i").value;
+
+const r = await fetch("/api/room",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body: JSON.stringify({
+mode:"chat",
+message,
+userId
+})
+});
+
+const d = await r.json();
+document.getElementById("out").innerText = d.reply;
+}
+
+</script>
+
+</body>
+</html>
