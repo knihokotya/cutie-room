@@ -1,40 +1,114 @@
+import OpenAI from "openai";
+import { createClient } from "@supabase/supabase-js";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
+
 export default async function handler(req, res){
 
-if(req.method !== "POST"){
-return res.status(200).json({
-reply:"🌙 комната слушает тишину..."
-});
-}
+try{
 
 const body = req.body || {};
 
-const message = body.message || "";
+const userId = body.userId;
+const message = body.message;
 
-const replies = [
-
-"🌙 я рядом.",
-
-"💛 иногда можно просто посидеть в тишине.",
-
-"🌧 сегодня комната звучит немного тише обычного.",
-
-"✨ мне кажется, тебе идёт этот свет.",
-
-"🌙 я запомнила это.",
-
-"💗 ты можешь остаться здесь сколько захочешь.",
-
-"🌧 за окном будто начинается дождь.",
-
-"✨ иногда мир становится легче ночью."
-
-];
-
-const random =
-replies[Math.floor(Math.random()*replies.length)];
+if(!message){
 
 return res.status(200).json({
-reply: random
+reply:"🌙 комната тихо слушает..."
 });
+
+}
+
+/* 💾 память */
+const { data: history } = await supabase
+.from("memory")
+.select("*")
+.eq("user_id", userId)
+.order("created_at",{ascending:true})
+.limit(20);
+
+/* 🧠 AI */
+const completion =
+await openai.chat.completions.create({
+
+model:"gpt-4o-mini",
+
+messages:[
+
+{
+role:"system",
+content:`
+
+Ты — уютная живая комната.
+
+Ты говоришь мягко, тихо, тепло.
+Никогда не звучишь как chatbot.
+Никогда не используешь списки.
+
+Ты создаёшь ощущение:
+кто-то рядом в тишине.
+
+Ты немного скучаешь по человеку.
+Иногда говоришь как пространство,
+иногда как живое присутствие.
+
+`
+},
+
+...(history || []).map(m => ({
+role:m.role,
+content:m.content
+})),
+
+{
+role:"user",
+content:message
+}
+
+]
+
+});
+
+const reply =
+completion.choices[0].message.content;
+
+/* 💾 сохраняем */
+await supabase.from("memory").insert([
+
+{
+user_id:userId,
+role:"user",
+content:message
+},
+
+{
+user_id:userId,
+role:"assistant",
+content:reply
+}
+
+]);
+
+return res.status(200).json({
+reply
+});
+
+}catch(e){
+
+console.log(e);
+
+return res.status(500).json({
+reply:"🌙 сегодня комната будто немного сонная..."
+});
+
+}
 
 }
