@@ -1,8 +1,5 @@
 {
-  "name": "room-ai-v10",
-  "type": "module",
-  "dependencies": {
-    "openai": "^4.0.0",
-    "@supabase/supabase-js": "^2.0.0"
-  }
+  "name":"room-ai",
+  "version":"1.0.0",
+  "type":"module"
 }
