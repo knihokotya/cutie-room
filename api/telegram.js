@@ -1,6 +1,8 @@
-export default async function handler(req, res){
+export default async function handler(req,res){
 
-console.log("Telegram update:", req.body);
+const update = req.body;
+
+console.log(update);
 
 return res.status(200).json({
 ok:true
