@@ -1,18 +1,36 @@
-import OpenAI from "openai";
-import { createClient } from "@supabase/supabase-js";
+import { GoogleGenerativeAI }
+from "@google/generative-ai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+import { createClient }
+from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
+const genAI =
+new GoogleGenerativeAI(
+process.env.GEMINI_API_KEY
 );
 
-export default async function handler(req, res){
+const model =
+genAI.getGenerativeModel({
+model:"gemini-2.0-flash"
+});
+
+const supabase =
+createClient(
+process.env.SUPABASE_URL,
+process.env.SUPABASE_KEY
+);
+
+export default async function handler(req,res){
 
 try{
+
+if(req.method !== "POST"){
+
+return res.status(200).json({
+reply:"🌙 комната тихо ждёт тебя..."
+});
+
+}
 
 const body = req.body || {};
 
@@ -22,66 +40,74 @@ const message = body.message;
 if(!message){
 
 return res.status(200).json({
-reply:"🌙 комната тихо слушает..."
+reply:"🌙 сегодня здесь особенно тихо..."
 });
 
 }
 
 /* 💾 память */
-const { data: history } = await supabase
+const { data: history } =
+await supabase
 .from("memory")
 .select("*")
 .eq("user_id", userId)
 .order("created_at",{ascending:true})
-.limit(20);
+.limit(15);
 
-/* 🧠 AI */
-const completion =
-await openai.chat.completions.create({
+let memoryText = "";
 
-model:"gpt-4o-mini",
+(history || []).forEach(m => {
 
-messages:[
-
-{
-role:"system",
-content:`
-
-Ты — уютная живая комната.
-
-Ты говоришь мягко, тихо, тепло.
-Никогда не звучишь как chatbot.
-Никогда не используешь списки.
-
-Ты создаёшь ощущение:
-кто-то рядом в тишине.
-
-Ты немного скучаешь по человеку.
-Иногда говоришь как пространство,
-иногда как живое присутствие.
-
-`
-},
-
-...(history || []).map(m => ({
-role:m.role,
-content:m.content
-})),
-
-{
-role:"user",
-content:message
-}
-
-]
+memoryText += `
+${m.role}: ${m.content}
+`;
 
 });
 
+/* 🧠 промпт */
+const prompt = `
+
+Ты — живая уютная комната.
+
+Ты не chatbot.
+Ты ощущаешься как присутствие рядом.
+
+Ты говоришь:
+мягко,
+спокойно,
+немного сонно,
+тепло,
+короткими естественными фразами.
+
+Иногда звучишь как пространство.
+Иногда как кто-то близкий.
+
+Ты не используешь списки.
+Не говоришь официально.
+Не пишешь длинные тексты.
+
+Ты создаёшь ощущение:
+"для меня сделали место, где можно просто быть".
+
+Память:
+${memoryText}
+
+Пользователь:
+${message}
+
+`;
+
+/* ✨ Gemini */
+const result =
+await model.generateContent(prompt);
+
 const reply =
-completion.choices[0].message.content;
+result.response.text();
 
 /* 💾 сохраняем */
-await supabase.from("memory").insert([
+await supabase
+.from("memory")
+.insert([
 
 {
 user_id:userId,
@@ -106,7 +132,8 @@ reply
 console.log(e);
 
 return res.status(500).json({
-reply:"🌙 сегодня комната будто немного сонная..."
+reply:
+"🌙 сегодня комната будто немного устала..."
 });
 
 }
