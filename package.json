@@ -1,9 +1,9 @@
 {
-  "name":"room-ai",
-  "version":"1.0.0",
-  "type":"module",
-  "dependencies":{
-    "@google/generative-ai":"^0.21.0",
-    "@supabase/supabase-js":"^2.39.0"
+  "name": "room-ai",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "@supabase/supabase-js": "^2.39.0"
   }
 }
