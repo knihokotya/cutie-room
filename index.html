@@ -4,47 +4,241 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Room AI</title>
+
 <style>
-*{ margin:0; padding:0; box-sizing:border-box; }
-body{ background:#0d0d0d; overflow:hidden; font-family:Georgia, serif; color:#f5e7c8; height:100vh; }
-.bg{ position:fixed; inset:0; background: radial-gradient(circle at center, rgba(255,210,120,0.15), transparent 60%), #0d0d0d; animation: breathe 8s ease-in-out infinite; }
-@keyframes breathe{ 0%{filter:brightness(1);} 50%{filter:brightness(1.08);} 100%{filter:brightness(1);} }
-.rain{ position:fixed; inset:0; pointer-events:none; opacity:0.12; background-image: linear-gradient(transparent, rgba(255,255,255,0.3)); background-size:2px 40px; animation: rain 0.3s linear infinite; }
-@keyframes rain{ from{background-position:0 0;} to{background-position:-10px 40px;} }
-.room{ position:relative; z-index:2; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:20px; text-align:center; }
-.title{ font-size:52px; margin-bottom:10px; color:#ffe4a8; text-shadow:0 0 20px rgba(255,220,140,0.3); animation: fade 3s ease; }
-@keyframes fade{ from{ opacity:0; transform:translateY(20px); } to{ opacity:1; transform:none; } }
-.subtitle{ opacity:0.7; margin-bottom:40px; font-size:18px; }
-.chat{ width:100%; max-width:700px; height:320px; overflow:auto; padding:20px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:30px; backdrop-filter:blur(10px); margin-bottom:20px; text-align:left; box-shadow: 0 0 30px rgba(255,220,150,0.05); }
-.msg{ margin-bottom:16px; line-height:1.6; animation: fadeMsg .5s ease; }
-.you{ color:#ffd98a; }
-.ai{ color:#f5e7c8; opacity:0.95; }
-@keyframes fadeMsg{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
-.inputRow{ display:flex; gap:10px; width:100%; max-width:700px; }
-input{ flex:1; padding:18px; border:none; outline:none; border-radius:20px; background:rgba(255,255,255,0.06); color:white; font-size:16px; }
-button{ padding:18px 24px; border:none; border-radius:20px; cursor:pointer; background:#f2d08c; color:#1a1a1a; font-weight:bold; transition:.3s; }
-button:hover{ transform:translateY(-2px); background:#ffe2aa; }
-.tg{ margin-top:18px; background:rgba(255,255,255,0.05); color:#f5e7c8; }
-.note{ margin-top:25px; opacity:0.4; font-size:14px; font-style:italic; }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+background:#0d0d0d;
+overflow:hidden;
+font-family:Georgia, serif;
+color:#f5e7c8;
+height:100vh;
+}
+
+/* 🌙 фон */
+.bg{
+position:fixed;
+inset:0;
+background:
+radial-gradient(circle at center,
+rgba(255,210,120,0.15),
+transparent 60%),
+#0d0d0d;
+animation: breathe 8s ease-in-out infinite;
+}
+
+@keyframes breathe{
+0%{filter:brightness(1);}
+50%{filter:brightness(1.08);}
+100%{filter:brightness(1);}
+}
+
+/* 🌧 дождь */
+.rain{
+position:fixed;
+inset:0;
+pointer-events:none;
+opacity:0.12;
+background-image:
+linear-gradient(transparent, rgba(255,255,255,0.3));
+background-size:2px 40px;
+animation: rain 0.3s linear infinite;
+}
+
+@keyframes rain{
+from{background-position:0 0;}
+to{background-position:-10px 40px;}
+}
+
+/* 🌙 комната */
+.room{
+position:relative;
+z-index:2;
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+padding:20px;
+text-align:center;
+}
+
+/* ✨ заголовок */
+.title{
+font-size:52px;
+margin-bottom:10px;
+color:#ffe4a8;
+text-shadow:0 0 20px rgba(255,220,140,0.3);
+animation: fade 3s ease;
+}
+
+@keyframes fade{
+from{
+opacity:0;
+transform:translateY(20px);
+}
+to{
+opacity:1;
+transform:none;
+}
+}
+
+.subtitle{
+opacity:0.7;
+margin-bottom:40px;
+font-size:18px;
+}
+
+/* 💬 чат */
+.chat{
+width:100%;
+max-width:700px;
+height:320px;
+overflow:auto;
+padding:20px;
+background:rgba(255,255,255,0.03);
+border:1px solid rgba(255,255,255,0.08);
+border-radius:30px;
+backdrop-filter:blur(10px);
+margin-bottom:20px;
+text-align:left;
+box-shadow:
+0 0 30px rgba(255,220,150,0.05);
+}
+
+.msg{
+margin-bottom:16px;
+line-height:1.6;
+animation: fadeMsg .5s ease;
+}
+
+.you{
+color:#ffd98a;
+}
+
+.ai{
+color:#f5e7c8;
+opacity:0.95;
+}
+
+@keyframes fadeMsg{
+from{
+opacity:0;
+transform:translateY(10px);
+}
+to{
+opacity:1;
+transform:none;
+}
+}
+
+/* 📝 ввод */
+.inputRow{
+display:flex;
+gap:10px;
+width:100%;
+max-width:700px;
+}
+
+input{
+flex:1;
+padding:18px;
+border:none;
+outline:none;
+border-radius:20px;
+background:rgba(255,255,255,0.06);
+color:white;
+font-size:16px;
+}
+
+button{
+padding:18px 24px;
+border:none;
+border-radius:20px;
+cursor:pointer;
+background:#f2d08c;
+color:#1a1a1a;
+font-weight:bold;
+transition:.3s;
+}
+
+button:hover{
+transform:translateY(-2px);
+background:#ffe2aa;
+}
+
+/* 🌙 tg кнопка как надежная ссылка */
+.tg-link{
+margin-top:18px;
+background:rgba(255,255,255,0.05);
+color:#f5e7c8;
+padding:18px 24px;
+border-radius:20px;
+text-decoration:none;
+display:inline-block;
+font-weight:bold;
+transition:.3s;
+cursor:pointer;
+}
+
+.tg-link:hover{
+transform:translateY(-2px);
+background:rgba(255,255,255,0.1);
+color:#ffe4a8;
+}
+
+.note{
+margin-top:25px;
+opacity:0.4;
+font-size:14px;
+font-style:italic;
+}
 </style>
 </head>
+
 <body>
+
 <div class="bg"></div>
 <div class="rain"></div>
+
 <div class="room">
+
 <div class="title">🌙 room ai</div>
-<div class="subtitle">я сделала тебе маленькое место в интернете</div>
+<div class="subtitle">
+я сделала тебе маленькое место в интернете
+</div>
+
 <div class="chat" id="chat"></div>
+
 <div class="inputRow">
 <input id="input" placeholder="можешь просто побыть здесь...">
 <button onclick="send()">send</button>
 </div>
-<button class="tg" onclick="linkTelegram()">💗 подключить Telegram</button>
+
+<!-- Изменено с button на безопасную ссылку-тег <a> -->
+<a class="tg-link" id="tgBtn" href="https://t.me" target="_blank">
+💗 подключить Telegram
+</a>
+
 <div class="note" id="note"></div>
+
 </div>
+
 <script>
-const userId = localStorage.getItem("room_user") || crypto.randomUUID();
+const userId =
+localStorage.getItem("room_user") ||
+crypto.randomUUID();
+
 localStorage.setItem("room_user", userId);
+
+// Динамически обновляем адрес ссылки Telegram, добавляя реферальный параметр старта
+document.getElementById("tgBtn").href = "https://t.me?start=link_" + userId;
+
 const chat = document.getElementById("chat");
 
 function addMessage(text, cls){
@@ -55,36 +249,51 @@ chat.appendChild(div);
 chat.scrollTop = chat.scrollHeight;
 }
 
-setTimeout(()=>{ addMessage("🌙 комната медленно оживает вокруг тебя...", "ai"); }, 700);
-setTimeout(()=>{ document.getElementById("note").innerText = "мне кажется, тебе идёт этот свет"; }, 4000);
+/* 🌙 стартовое сообщение */
+setTimeout(()=>{
+addMessage(
+"🌙 комната медленно оживает вокруг тебя...",
+"ai"
+);
+},700);
 
+setTimeout(()=>{
+document.getElementById("note").innerText =
+"мне кажется, тебе идёт этот свет";
+},4000);
+
+/* 💬 отправка */
 async function send(){
 const input = document.getElementById("input");
 const text = input.value.trim();
 if(!text) return;
+
 addMessage("ты: " + text, "you");
 input.value = "";
+
 try{
 const r = await fetch("/api/room",{
 method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({ message:text, userId })
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+message:text,
+userId
+})
 });
+
 const d = await r.json();
 addMessage("комната: " + d.reply, "ai");
+
 }catch(e){
-addMessage("🌙 сегодня комната немного молчит...", "ai");
+addMessage(
+"🌙 сегодня комната немного молчит...",
+"ai"
+);
 }
 }
-
-function linkTelegram(){
-  // Заменили cuteroombot на реальное имя вашего бота
-  window.open(
-    "https://t.me_" + userId,
-    "_blank"
-  );
-}
-
 </script>
+
 </body>
 </html>
